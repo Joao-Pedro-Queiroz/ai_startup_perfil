@@ -1,11 +1,9 @@
 package ai.startup.perfil.perfil;
 
+import java.util.Map;
+
 public record PerfilDTO(
         String id,
         String user_id,
-        String topic,
-        String subskill,
-        Long acertos,
-        Long erros,
-        Double acuracia
+        Map<String, TopicDTO> topics
 ) {}

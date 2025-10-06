@@ -1,6 +1,5 @@
 package ai.startup.perfil.perfil;
 
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,59 +8,40 @@ import java.util.List;
 
 @RestController
 @RequestMapping
+@SecurityRequirement(name = "bearerAuth")
 public class PerfilController {
+  private final PerfilService service;
+  public PerfilController(PerfilService service) { this.service = service; }
 
-    private final PerfilService service;
+  @PostMapping("/perfis")
+  public ResponseEntity<List<PerfilDTO>> criarEmLote(@RequestBody List<PerfilCreateDTO> lista) {
+    return ResponseEntity.ok(service.criarEmLote(lista));
+  }
 
-    public PerfilController(PerfilService service) {
-        this.service = service;
-    }
+  @GetMapping("/perfis")
+  public ResponseEntity<List<PerfilDTO>> listar() { return ResponseEntity.ok(service.listar()); }
 
-    // Protegidas (JWT): use o mesmo SecurityFilter/JwtService que nos outros serviços
-    @SecurityRequirement(name = "bearerAuth")
-    @Operation(summary = "Criar perfis em lote")
-    @PostMapping("/perfis")
-    public ResponseEntity<List<PerfilDTO>> criarEmLote(@RequestBody List<PerfilCreateDTO> lista) {
-        return ResponseEntity.ok(service.criarEmLote(lista));
-    }
+  @GetMapping("/perfis/{id}")
+  public ResponseEntity<PerfilDTO> obter(@PathVariable String id) { return ResponseEntity.ok(service.obter(id)); }
 
-    @SecurityRequirement(name = "bearerAuth")
-    @GetMapping("/perfis")
-    public ResponseEntity<List<PerfilDTO>> listar() {
-        return ResponseEntity.ok(service.listar());
-    }
+  @PutMapping("/perfis/{id}")
+  public ResponseEntity<PerfilDTO> atualizar(@PathVariable String id, @RequestBody PerfilUpdateDTO dto) {
+    return ResponseEntity.ok(service.atualizar(id, dto));
+  }
 
-     // extra: listar por id_usuario
-    @SecurityRequirement(name = "bearerAuth")
-    @GetMapping("/perfis/by-usuario/{userId}")
-    public ResponseEntity<List<PerfilDTO>> listarPorUsuario(@PathVariable String userId) {
-        return ResponseEntity.ok(service.listarPorUsuario(userId));
-    }
-    
-    @SecurityRequirement(name = "bearerAuth")
-    @GetMapping("/perfis/by-usuario-topic")
-    public ResponseEntity<List<PerfilDTO>> listarPorUsuarioETopic(
-            @RequestParam("user_id") String userId,
-            @RequestParam String topic) {
-        return ResponseEntity.ok(service.listarPorUsuarioETopic(userId, topic));
-    }
+  @DeleteMapping("/perfis/{id}")
+  public ResponseEntity<Void> deletar(@PathVariable String id) {
+    service.deletar(id); return ResponseEntity.noContent().build();
+  }
 
-    @SecurityRequirement(name = "bearerAuth")
-    @GetMapping("/perfis/{id}")
-    public ResponseEntity<PerfilDTO> obter(@PathVariable String id) {
-        return ResponseEntity.ok(service.obter(id));
-    }
+  @GetMapping("/perfis/by-usuario/{userId}")
+  public ResponseEntity<List<PerfilDTO>> listarPorUsuario(@PathVariable String userId) {
+    return ResponseEntity.ok(service.listarPorUsuario(userId));
+  }
 
-    @SecurityRequirement(name = "bearerAuth")
-    @PutMapping("/perfis/{id}")
-    public ResponseEntity<PerfilDTO> atualizar(@PathVariable String id, @RequestBody PerfilUpdateDTO dto) {
-        return ResponseEntity.ok(service.atualizar(id, dto));
-    }
-
-    @SecurityRequirement(name = "bearerAuth")
-    @DeleteMapping("/perfis/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable String id) {
-        service.deletar(id);
-        return ResponseEntity.noContent().build();
-    }
+  @GetMapping("/perfis/by-usuario-topic")
+  public ResponseEntity<PerfilDTO> listarPorUsuarioETopic(@RequestParam("user_id") String userId,
+                                                          @RequestParam String topic) {
+    return ResponseEntity.ok(service.listarPorUsuarioETopic(userId, topic));
+  }
 }
