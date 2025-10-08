@@ -24,26 +24,26 @@ public class PerfilService {
                 .orElseThrow(() -> new RuntimeException("Perfil não encontrado."));
     }
 
-    /** POST em lote no formato hierárquico */
-    public List<PerfilDTO> criarEmLote(List<PerfilCreateDTO> itens) {
-        List<Perfil> out = new ArrayList<>();
-        for (var it : itens) {
-            Perfil p = repo.findFirstByUserId(it.user_id());
-            if (p == null) {
-                p = Perfil.builder()
-                        .userId(it.user_id())
-                        .topics(fromTopicsDTO(it.topics()))
-                        .build();
-            } else {
-                if (p.getTopics() == null) p.setTopics(new HashMap<>());
-                mergeTopics(p.getTopics(), fromTopicsDTO(it.topics()));
-            }
-            out.add(repo.save(p));
+    /** POST (singular): cria ou atualiza por user_id com merge hierárquico */
+    public PerfilDTO criarOuAtualizar(PerfilCreateDTO it) {
+        if (it == null || it.user_id() == null) {
+            throw new RuntimeException("Payload inválido: user_id é obrigatório.");
         }
-        return out.stream().map(this::toDTO).toList();
+
+        Perfil p = repo.findFirstByUserId(it.user_id());
+        if (p == null) {
+            p = Perfil.builder()
+                    .userId(it.user_id())
+                    .topics(fromTopicsDTO(it.topics()))
+                    .build();
+        } else {
+            if (p.getTopics() == null) p.setTopics(new HashMap<>());
+            mergeTopics(p.getTopics(), fromTopicsDTO(it.topics()));
+        }
+        return toDTO(repo.save(p));
     }
 
-    /** Update parcial: faz merge recursivo de topics/subskills/structures */
+    /** Update parcial por id: merge recursivo de topics/subskills/structures */
     public PerfilDTO atualizar(String id, PerfilUpdateDTO dto) {
         var p = repo.findById(id).orElseThrow(() -> new RuntimeException("Perfil não encontrado."));
         if (dto.user_id() != null) p.setUserId(dto.user_id());
@@ -63,7 +63,7 @@ public class PerfilService {
         return repo.findByUserId(userId).stream().map(this::toDTO).toList();
     }
 
-    /** Retorna somente o recorte de um tópico do usuário (útil para painéis) */
+    /** Recorte por tópico do usuário (útil para painéis) */
     public PerfilDTO listarPorUsuarioETopic(String userId, String topic) {
         var p = repo.findFirstByUserId(userId);
         if (p == null) throw new RuntimeException("Perfil não encontrado para o usuário.");
@@ -74,7 +74,7 @@ public class PerfilService {
         return new PerfilDTO(p.getId(), p.getUserId(), toTopicsDTO(slice));
     }
 
-    // ====== Mappers DTO <-> Entidade ======
+    // ======= Mappers DTO <-> Entidade =======
     private Map<String, Perfil.TopicProfile> fromTopicsDTO(Map<String, TopicDTO> dtos) {
         if (dtos == null) return null;
         Map<String, Perfil.TopicProfile> out = new HashMap<>();
@@ -189,7 +189,7 @@ public class PerfilService {
         return new PerfilDTO(p.getId(), p.getUserId(), toTopicsDTO(p.getTopics()));
     }
 
-    // ====== Merge recursivo ======
+    // ===== Merge recursivo (só sobrescreve campos não nulos) =====
     private void mergeTopics(Map<String, Perfil.TopicProfile> base, Map<String, Perfil.TopicProfile> inc) {
         if (inc == null || base == null) return;
         for (var eTopic : inc.entrySet()) {

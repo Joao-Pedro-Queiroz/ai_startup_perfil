@@ -10,38 +10,47 @@ import java.util.List;
 @RequestMapping
 @SecurityRequirement(name = "bearerAuth")
 public class PerfilController {
-  private final PerfilService service;
-  public PerfilController(PerfilService service) { this.service = service; }
 
-  @PostMapping("/perfis")
-  public ResponseEntity<List<PerfilDTO>> criarEmLote(@RequestBody List<PerfilCreateDTO> lista) {
-    return ResponseEntity.ok(service.criarEmLote(lista));
-  }
+    private final PerfilService service;
 
-  @GetMapping("/perfis")
-  public ResponseEntity<List<PerfilDTO>> listar() { return ResponseEntity.ok(service.listar()); }
+    public PerfilController(PerfilService service) {
+        this.service = service;
+    }
 
-  @GetMapping("/perfis/{id}")
-  public ResponseEntity<PerfilDTO> obter(@PathVariable String id) { return ResponseEntity.ok(service.obter(id)); }
+    @PostMapping("/perfis")
+    public ResponseEntity<PerfilDTO> criarOuAtualizar(@RequestBody PerfilCreateDTO dto) {
+        return ResponseEntity.ok(service.criarOuAtualizar(dto));
+    }
 
-  @PutMapping("/perfis/{id}")
-  public ResponseEntity<PerfilDTO> atualizar(@PathVariable String id, @RequestBody PerfilUpdateDTO dto) {
-    return ResponseEntity.ok(service.atualizar(id, dto));
-  }
+    @GetMapping("/perfis")
+    public ResponseEntity<List<PerfilDTO>> listar() {
+        return ResponseEntity.ok(service.listar());
+    }
 
-  @DeleteMapping("/perfis/{id}")
-  public ResponseEntity<Void> deletar(@PathVariable String id) {
-    service.deletar(id); return ResponseEntity.noContent().build();
-  }
+    @GetMapping("/perfis/{id}")
+    public ResponseEntity<PerfilDTO> obter(@PathVariable String id) {
+        return ResponseEntity.ok(service.obter(id));
+    }
 
-  @GetMapping("/perfis/by-usuario/{userId}")
-  public ResponseEntity<List<PerfilDTO>> listarPorUsuario(@PathVariable String userId) {
-    return ResponseEntity.ok(service.listarPorUsuario(userId));
-  }
+    @PutMapping("/perfis/{id}")
+    public ResponseEntity<PerfilDTO> atualizar(@PathVariable String id, @RequestBody PerfilUpdateDTO dto) {
+        return ResponseEntity.ok(service.atualizar(id, dto));
+    }
 
-  @GetMapping("/perfis/by-usuario-topic")
-  public ResponseEntity<PerfilDTO> listarPorUsuarioETopic(@RequestParam("user_id") String userId,
-                                                          @RequestParam String topic) {
-    return ResponseEntity.ok(service.listarPorUsuarioETopic(userId, topic));
-  }
+    @DeleteMapping("/perfis/{id}")
+    public ResponseEntity<Void> deletar(@PathVariable String id) {
+        service.deletar(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/perfis/by-usuario/{userId}")
+    public ResponseEntity<List<PerfilDTO>> listarPorUsuario(@PathVariable String userId) {
+        return ResponseEntity.ok(service.listarPorUsuario(userId));
+    }
+
+    @GetMapping("/perfis/by-usuario-topic")
+    public ResponseEntity<PerfilDTO> listarPorUsuarioETopic(@RequestParam("user_id") String userId,
+                                                            @RequestParam String topic) {
+        return ResponseEntity.ok(service.listarPorUsuarioETopic(userId, topic));
+    }
 }
