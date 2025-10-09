@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.Map;
 
 @Data @NoArgsConstructor @AllArgsConstructor @Builder
-@Document("perfis")
+@Document("UserProfile")
 public class Perfil {
     @Id
     private String id;
