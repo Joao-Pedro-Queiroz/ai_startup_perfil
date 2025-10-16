@@ -158,6 +158,7 @@ public class PerfilService {
                 s.getHints_rate_s(),
                 s.getSolutions_rate_s(),
                 s.getLast_seen_at_s(),
+                s.getMissed_two_sessions(),
                 s.getEasy_seen_s(),
                 s.getMedium_seen_s(),
                 s.getHard_seen_s(),

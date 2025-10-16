@@ -8,6 +8,7 @@ public record SubskillDTO(
         Double hints_rate_s,
         Double solutions_rate_s,
         String last_seen_at_s,
+        Boolean missed_two_sessions,
         Boolean easy_seen_s,
         Boolean medium_seen_s,
         Boolean hard_seen_s,

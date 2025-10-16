@@ -28,6 +28,7 @@ public class Perfil {
         private Double hints_rate_s;
         private Double solutions_rate_s;
         private String last_seen_at_s; // pode ser ISO-8601; manter String p/ flexibilidade
+        private Boolean missed_two_sessions;
         private Boolean easy_seen_s;
         private Boolean medium_seen_s;
         private Boolean hard_seen_s;
