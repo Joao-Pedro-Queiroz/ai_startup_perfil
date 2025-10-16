@@ -18,8 +18,8 @@ public class PerfilController {
     }
 
     @PostMapping("/perfis")
-    public ResponseEntity<PerfilDTO> criarOuAtualizar(@RequestBody PerfilCreateDTO dto) {
-        return ResponseEntity.ok(service.criarOuAtualizar(dto));
+    public ResponseEntity<PerfilDTO> criar(@RequestBody PerfilCreateDTO dto) {
+        return ResponseEntity.ok(service.criar(dto));
     }
 
     @GetMapping("/perfis")

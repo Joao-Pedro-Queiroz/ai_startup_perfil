@@ -24,23 +24,23 @@ public class PerfilService {
                 .orElseThrow(() -> new RuntimeException("Perfil não encontrado."));
     }
 
-    /** POST (singular): cria ou atualiza por user_id com merge hierárquico */
-    public PerfilDTO criarOuAtualizar(PerfilCreateDTO it) {
+    public PerfilDTO criar(PerfilCreateDTO it) {
         if (it == null || it.user_id() == null) {
             throw new RuntimeException("Payload inválido: user_id é obrigatório.");
         }
 
-        Perfil p = repo.findFirstByUserId(it.user_id());
-        if (p == null) {
-            p = Perfil.builder()
-                    .userId(it.user_id())
-                    .topics(fromTopicsDTO(it.topics()))
-                    .build();
-        } else {
-            if (p.getTopics() == null) p.setTopics(new HashMap<>());
-            mergeTopics(p.getTopics(), fromTopicsDTO(it.topics()));
+        Perfil existente = repo.findFirstByUserId(it.user_id());
+        if (existente != null) {
+            // Você pode trocar por ResponseStatusException(HttpStatus.CONFLICT, ...) no controller
+            throw new RuntimeException("Perfil já existente para o user_id: " + it.user_id());
         }
-        return toDTO(repo.save(p));
+
+        Perfil novo = Perfil.builder()
+                .userId(it.user_id())
+                .topics(fromTopicsDTO(it.topics()))
+                .build();
+
+        return toDTO(repo.save(novo));
     }
 
     /** Update parcial por id: merge recursivo de topics/subskills/structures */
