@@ -103,6 +103,7 @@ public class PerfilService {
                 .hints_rate_s(s.hints_rate_s())
                 .solutions_rate_s(s.solutions_rate_s())
                 .last_seen_at_s(s.last_seen_at_s())
+                .missed_two_sessions(s.missed_two_sessions())
                 .easy_seen_s(s.easy_seen_s())
                 .medium_seen_s(s.medium_seen_s())
                 .hard_seen_s(s.hard_seen_s())
@@ -214,6 +215,7 @@ public class PerfilService {
             if (in.getHints_rate_s()!= null) b.setHints_rate_s(in.getHints_rate_s());
             if (in.getSolutions_rate_s()!= null) b.setSolutions_rate_s(in.getSolutions_rate_s());
             if (in.getLast_seen_at_s()!= null) b.setLast_seen_at_s(in.getLast_seen_at_s());
+            if (in.getMissed_two_sessions() != null) b.setMissed_two_sessions(in.getMissed_two_sessions());
             if (in.getEasy_seen_s() != null) b.setEasy_seen_s(in.getEasy_seen_s());
             if (in.getMedium_seen_s()!= null) b.setMedium_seen_s(in.getMedium_seen_s());
             if (in.getHard_seen_s()  != null) b.setHard_seen_s(in.getHard_seen_s());
