@@ -1,6 +1,8 @@
 package ai.startup.perfil.perfil;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
@@ -21,18 +23,19 @@ public class PerfilService {
     public PerfilDTO obter(String id) {
         return repo.findById(id)
                 .map(this::toDTO)
-                .orElseThrow(() -> new RuntimeException("Perfil não encontrado."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Perfil não encontrado."));
     }
 
     public PerfilDTO criar(PerfilCreateDTO it) {
         if (it == null || it.user_id() == null) {
-            throw new RuntimeException("Payload inválido: user_id é obrigatório.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Payload inválido: user_id é obrigatório.");
         }
 
         Perfil existente = repo.findFirstByUserId(it.user_id());
         if (existente != null) {
-            // Você pode trocar por ResponseStatusException(HttpStatus.CONFLICT, ...) no controller
-            throw new RuntimeException("Perfil já existente para o user_id: " + it.user_id());
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT, "Perfil já existente para o user_id: " + it.user_id()
+            );
         }
 
         Perfil novo = Perfil.builder()
@@ -45,7 +48,9 @@ public class PerfilService {
 
     /** Update parcial por id: merge recursivo de topics/subskills/structures */
     public PerfilDTO atualizar(String id, PerfilUpdateDTO dto) {
-        var p = repo.findById(id).orElseThrow(() -> new RuntimeException("Perfil não encontrado."));
+        var p = repo.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Perfil não encontrado."));
+
         if (dto.user_id() != null) p.setUserId(dto.user_id());
         if (dto.topics() != null) {
             if (p.getTopics() == null) p.setTopics(new HashMap<>());
@@ -55,18 +60,25 @@ public class PerfilService {
     }
 
     public void deletar(String id) {
-        if (!repo.existsById(id)) throw new RuntimeException("Perfil não encontrado.");
+        if (!repo.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Perfil não encontrado.");
+        }
         repo.deleteById(id);
     }
 
     public PerfilDTO obterPorUsuario(String userId) {
         var p = repo.findFirstByUserId(userId);
-        if (p == null) throw new RuntimeException("Perfil não encontrado para o usuário.");
+        if (p == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Perfil não encontrado para o usuário.");
+        }
         return toDTO(p);
     }
 
     public PerfilDTO atualizarPorUsuario(String userId, PerfilCreateDTO inc) {
-        if (inc == null) throw new RuntimeException("Payload inválido.");
+        if (inc == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Payload inválido.");
+        }
+
         var p = repo.findFirstByUserId(userId);
         if (p == null) {
             // se não existir, cria já com o userId
@@ -84,7 +96,9 @@ public class PerfilService {
     /** Recorte por tópico do usuário (útil para painéis) */
     public PerfilDTO listarPorUsuarioETopic(String userId, String topic) {
         var p = repo.findFirstByUserId(userId);
-        if (p == null) throw new RuntimeException("Perfil não encontrado para o usuário.");
+        if (p == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Perfil não encontrado para o usuário.");
+        }
         Map<String, Perfil.TopicProfile> slice = new HashMap<>();
         if (p.getTopics() != null && p.getTopics().containsKey(topic)) {
             slice.put(topic, p.getTopics().get(topic));
