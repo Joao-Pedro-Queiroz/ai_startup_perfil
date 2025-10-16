@@ -59,8 +59,26 @@ public class PerfilService {
         repo.deleteById(id);
     }
 
-    public List<PerfilDTO> listarPorUsuario(String userId) {
-        return repo.findByUserId(userId).stream().map(this::toDTO).toList();
+    public PerfilDTO obterPorUsuario(String userId) {
+        var p = repo.findFirstByUserId(userId);
+        if (p == null) throw new RuntimeException("Perfil não encontrado para o usuário.");
+        return toDTO(p);
+    }
+
+    public PerfilDTO atualizarPorUsuario(String userId, PerfilCreateDTO inc) {
+        if (inc == null) throw new RuntimeException("Payload inválido.");
+        var p = repo.findFirstByUserId(userId);
+        if (p == null) {
+            // se não existir, cria já com o userId
+            p = Perfil.builder()
+                    .userId(userId)
+                    .topics(fromTopicsDTO(inc.topics()))
+                    .build();
+        } else {
+            if (p.getTopics() == null) p.setTopics(new HashMap<>());
+            mergeTopics(p.getTopics(), fromTopicsDTO(inc.topics()));
+        }
+        return toDTO(repo.save(p));
     }
 
     /** Recorte por tópico do usuário (útil para painéis) */

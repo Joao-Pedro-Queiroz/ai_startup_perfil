@@ -44,8 +44,15 @@ public class PerfilController {
     }
 
     @GetMapping("/perfis/by-usuario/{userId}")
-    public ResponseEntity<List<PerfilDTO>> listarPorUsuario(@PathVariable String userId) {
-        return ResponseEntity.ok(service.listarPorUsuario(userId));
+    public ResponseEntity<PerfilDTO> obterPorUsuario(@PathVariable String userId) {
+        return ResponseEntity.ok(service.obterPorUsuario(userId));
+    }
+
+    @PutMapping("/perfis/by-usuario/{userId}")
+    public ResponseEntity<PerfilDTO> atualizarPorUsuario(@PathVariable String userId,
+                                                         @RequestBody PerfilCreateDTO dto) {
+        var atualizado = service.atualizarPorUsuario(userId, dto);
+        return ResponseEntity.ok(atualizado);
     }
 
     @GetMapping("/perfis/by-usuario-topic")
