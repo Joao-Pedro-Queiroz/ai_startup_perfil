@@ -3,6 +3,7 @@ package ai.startup.perfil.perfil;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.Map;
 
@@ -12,7 +13,8 @@ public class Perfil {
     @Id
     private String id;
 
-    private String user_id;                  // "user_id"
+    @Field("user_id")
+    private String userId;                  // "user_id"
     private Map<String, TopicProfile> topics; // ex.: "algebra" -> TopicProfile
 
     @Data @NoArgsConstructor @AllArgsConstructor @Builder
