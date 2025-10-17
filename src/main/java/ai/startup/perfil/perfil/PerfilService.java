@@ -39,7 +39,7 @@ public class PerfilService {
         }
 
         Perfil novo = Perfil.builder()
-                .userId(it.user_id())
+                .user_id(it.user_id())
                 .topics(fromTopicsDTO(it.topics()))
                 .build();
 
@@ -51,7 +51,7 @@ public class PerfilService {
         var p = repo.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Perfil não encontrado."));
 
-        if (dto.user_id() != null) p.setUserId(dto.user_id());
+        if (dto.user_id() != null) p.setUser_id(dto.user_id());
         if (dto.topics() != null) {
             if (p.getTopics() == null) p.setTopics(new HashMap<>());
             mergeTopics(p.getTopics(), fromTopicsDTO(dto.topics()));
@@ -83,7 +83,7 @@ public class PerfilService {
         if (p == null) {
             // se não existir, cria já com o userId
             p = Perfil.builder()
-                    .userId(userId)
+                    .user_id(userId)
                     .topics(fromTopicsDTO(inc.topics()))
                     .build();
         } else {
@@ -103,7 +103,7 @@ public class PerfilService {
         if (p.getTopics() != null && p.getTopics().containsKey(topic)) {
             slice.put(topic, p.getTopics().get(topic));
         }
-        return new PerfilDTO(p.getId(), p.getUserId(), toTopicsDTO(slice));
+        return new PerfilDTO(p.getId(), p.getUser_id(), toTopicsDTO(slice));
     }
 
     // ======= Mappers DTO <-> Entidade =======
@@ -220,7 +220,7 @@ public class PerfilService {
     }
 
     private PerfilDTO toDTO(Perfil p) {
-        return new PerfilDTO(p.getId(), p.getUserId(), toTopicsDTO(p.getTopics()));
+        return new PerfilDTO(p.getId(), p.getUser_id(), toTopicsDTO(p.getTopics()));
     }
 
     // ===== Merge recursivo (só sobrescreve campos não nulos) =====

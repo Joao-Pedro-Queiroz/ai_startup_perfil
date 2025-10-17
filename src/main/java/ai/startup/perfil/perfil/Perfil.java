@@ -12,7 +12,7 @@ public class Perfil {
     @Id
     private String id;
 
-    private String userId;                  // "user_id"
+    private String user_id;                  // "user_id"
     private Map<String, TopicProfile> topics; // ex.: "algebra" -> TopicProfile
 
     @Data @NoArgsConstructor @AllArgsConstructor @Builder
