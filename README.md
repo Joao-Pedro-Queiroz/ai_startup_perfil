@@ -36,21 +36,21 @@ flowchart LR
 
 ## 🏛️ Arquitetura da Solução
 
-- Python 3.11
-- FastAPI
-- Motor de persistência: **MongoDB**
-- Estratégia de merge hierárquico:
-  - **Nunca remove subskills**
-  - **Inclui novas ao surgir**
-  - **Recalcula estatísticas globais**
+- Spring Boot 3.4
+- MongoDB Atlas (Replica Set)
+- JWT (Auth)
+- API REST com validação por header `Authorization: Bearer <token>`
+- Repository Pattern com Spring Data MongoDB
 
-📌 Comunicação com outros serviços:
+📌 Tipos de comunicação:
+| Componente | Consome Usuário? | Para quê? |
+|----------|:---:|-------------|
+| Front-End | ❌ | Não Acessa o microserviço diretamente |
+| MS Simulado | ✅ | Atualizar perfil do usuário |
+| MS Usuário | ✅ | Salvar perfil base do usuárioa |
+| MS Questões | ❌ | Apenas recebe user_id como referência |
 
-| Serviço | Ação |
-|--------|-----|
-| Simulado | Atualiza Perfil após cada conclusão |
-| Questões | Origem de resultados para cálculo do Perfil |
-| Modelo adaptativo | Consumidor do Perfil para criar próximos simulados |
+---
 
 ---
 
@@ -58,29 +58,29 @@ flowchart LR
 
 ### ✅ Requisitos
 
-- Python 3.11+
-- MongoDB em execução
-- Gerenciador: `uvicorn`
+- Java 21+
+- Maven 3.9+
+- Conexão com MongoDB (Atlas ou local)
 
-### 🔧 Variáveis de ambiente
+### 🔌 Variáveis de Ambiente / `application.properties`
 
-`.env` ou ambiente:
+```properties
+spring.data.mongodb.uri=${MONGO_URI}
+spring.data.mongodb.database=brainwinTest
 
+jwt.secret=${JWT_SECRET}
+jwt.expiration-ms=86400000
 ```
-MONGO_URI=mongodb://localhost:27017
-MONGO_DB=brainwinTest
-MONGO_PROFILE_COLLECTION=perfil
-```
 
-### ▶️ Rodar localmente
+### ▶️ Executando
 
 ```sh
-pip install -r requirements.txt
-uvicorn app:app --reload --port 8084
+mvn clean package
+java -jar target/perfil-0.0.1-SNAPSHOT.jar
 ```
 
-Servidor disponível em:  
-📍 `http://localhost:8084`
+Servidor inicia em:  
+📍 `http://localhost:8083`
 
 ---
 
@@ -122,17 +122,30 @@ Servidor disponível em:
 ## 🧱 Estrutura do Projeto
 
 ```plaintext
-ai_startup_perfil/
+ai_startup_usuario/
 │
-├─ app/
-│  ├─ perfil.py
-│  ├─ perfil_model.py       # conversões e representações
-│  ├─ perfil_service.py     # regras de merge e cálculo
-│  ├─ mongo.py              # driver de conexão MongoDB
-│  └─ config.py             # configurações
+├─ src/main/java/ai/startup/usuario
+│  ├─ auth/
+│  │  └─ JwtService.java
+│  │
+│  ├─ security/
+│  │  └─ SecurityFilter.java
+│  │
+│  ├─ perfil/
+│  │  ├─ PerfilController.java
+│  │  ├─ PerfilService.java
+│  │  ├─ PerfilRepository.java
+│  │  ├─ Perfil.java
+│  │  ├─ PerfilDTO.java
+│  │  ├─ PerfilCreateDTO.java
+│  │  └─ PerfilUpdateDTO.java
+│  │  └─ StructureDTO.java
+│  │  └─ SubskillDTO.java
+│  │  └─ TopicDTO.java
+│  │
+│  └─ PerfilApplication.java
 │
-├─ requirements.txt
-└─ README.md
+└─ pom.xml
 ```
 
 ---
@@ -145,32 +158,3 @@ ai_startup_perfil/
 | Atualizar perfil via SimuladoService | ✅ |
 | Preservar histórico completo | ✅ |
 | Preparo para features de aprendizado adaptativo | ✅ |
-
----
-
-## ✨ Observações Importantes
-
-✅ O Perfil **sempre contém todas as skills possíveis**  
-✅ Estatísticas agregadas são recalculadas a cada finalização  
-✅ Nunca há “perda” de aprendizado do aluno  
-✅ Designado para evoluir sem migração estrutural
-
----
-
-📌 Próximas evoluções sugeridas:
-
-- Reforço adaptativo para estruturas com maior dificuldade
-- Histórico temporal de evolução por tópico
-- Métricas contextualizadas por tentativa
-
----
-
-Se precisar, posso também:
-✅ Criar badges e logo no topo  
-✅ Adicionar exemplos mais complexos de payload  
-✅ Melhorar arte do fluxograma com cores e status
-
----
-
-✉️ Suporte via: SimuladoService → PerfilClient  
-🚀 BrainWin – uma plataforma que aprende com você! ✅
